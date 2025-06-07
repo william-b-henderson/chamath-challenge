@@ -1,11 +1,9 @@
 import sys
-import pickle
-import numpy as np
-from decision_tree import predict_new_case, load_data, train_decision_tree
+from decision_tree import load_model, predict_new_case
 
 
 def main():
-    # Check if we have the required arguments
+    # Check if correct number of arguments provided
     if len(sys.argv) != 4:
         print(
             "Usage: python predict.py <trip_duration_days> <miles_traveled> <total_receipts_amount>"
@@ -13,25 +11,30 @@ def main():
         sys.exit(1)
 
     try:
-        # Parse arguments
+        # Parse command line arguments
         trip_duration_days = float(sys.argv[1])
         miles_traveled = float(sys.argv[2])
         total_receipts_amount = float(sys.argv[3])
 
-        # Load and train the model
-        df = load_data()
-        dt, _, _, _, _, _ = train_decision_tree(df, max_depth=10)
+        # Load the saved model
+        dt = load_model(verbose=False)
+        if dt is None:
+            print(
+                "Error: No trained model found. Please run decision_tree.py first to train the model."
+            )
+            sys.exit(1)
 
         # Make prediction
         prediction = predict_new_case(
             dt, trip_duration_days, miles_traveled, total_receipts_amount
         )
-
-        # Print just the prediction number (required by eval.sh)
         print(f"{prediction:.2f}")
 
+    except ValueError as e:
+        print(f"Error: Invalid input - {str(e)}")
+        sys.exit(1)
     except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
+        print(f"Error: {str(e)}")
         sys.exit(1)
 
 

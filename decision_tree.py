@@ -1,6 +1,8 @@
 import json
 import numpy as np
 import pandas as pd
+import pickle
+import os
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -513,63 +515,92 @@ def evaluate_model(dt, df):
     }
 
 
+def save_model(dt, model_path="trained_model.pkl"):
+    """Save the trained decision tree model to a file"""
+    with open(model_path, "wb") as f:
+        pickle.dump(dt, f)
+    print(f"Model saved to {model_path}")
+
+
+def load_model(model_path="trained_model.pkl", verbose=True):
+    """Load a trained decision tree model from a file"""
+    if not os.path.exists(model_path):
+        return None
+    with open(model_path, "rb") as f:
+        dt = pickle.load(f)
+    if verbose:
+        print(f"Model loaded from {model_path}")
+    return dt
+
+
 def main():
-    # Load the data
-    print("Loading data...")
-    df = load_data()
+    # Try to load existing model first
+    model_path = "trained_model.pkl"
+    dt = load_model(model_path)
 
-    # Explore the data
-    explore_data(df)
+    if dt is None:
+        # Load the data
+        print("Loading data...")
+        df = load_data()
 
-    # Find optimal tree depth
-    optimal_depth = optimize_tree_depth(df)
+        # Explore the data
+        explore_data(df)
 
-    # Train the decision tree with optimal depth
-    print(f"\nTraining decision tree with depth {optimal_depth}...")
-    dt, X_train, X_test, y_train, y_test, y_test_pred = train_decision_tree(
-        df, max_depth=optimal_depth
-    )
+        # Find optimal tree depth
+        optimal_depth = optimize_tree_depth(df)
 
-    # Analyze feature importance
-    feature_names = [
-        "trip_duration_days",
-        "miles_traveled",
-        "total_receipts_amount",
-        "miles_per_day",
-        "is_efficient_trip",
-        "daily_spending",
-        "is_optimal_spending",
-        "is_sweet_spot_trip",
-        "is_five_day_trip",
-        "mileage_tier",
-        "receipts_per_day",
-        "is_low_receipts",
-        "is_high_receipts",
-        "trip_type",
-    ]
-    analyze_feature_importance(dt, feature_names)
-
-    # Display tree rules
-    display_tree_rules(dt)
-
-    # Plot predictions vs actual
-    plot_predictions_vs_actual(y_test, y_test_pred)
-
-    # Evaluate model performance
-    print("\nEvaluating model performance...")
-    evaluation_results = evaluate_model(dt, df)
-
-    # Example predictions
-    print("\nExample Predictions:")
-    examples = [(3, 93, 1.42), (1, 55, 3.6), (5, 130, 306.9), (14, 958, 1727.76)]
-
-    for trip_days, miles, receipts in examples:
-        prediction = predict_new_case(dt, trip_days, miles, receipts)
-        print(
-            f"Trip: {trip_days} days, {miles} miles, ${receipts:.2f} receipts -> Predicted: ${prediction:.2f}"
+        # Train the decision tree with optimal depth
+        print(f"\nTraining decision tree with depth {optimal_depth}...")
+        dt, X_train, X_test, y_train, y_test, y_test_pred = train_decision_tree(
+            df, max_depth=optimal_depth
         )
 
-    return dt, df, evaluation_results
+        # Save the trained model
+        save_model(dt, model_path)
+
+        # Analyze feature importance
+        feature_names = [
+            "trip_duration_days",
+            "miles_traveled",
+            "total_receipts_amount",
+            "miles_per_day",
+            "is_efficient_trip",
+            "daily_spending",
+            "is_optimal_spending",
+            "is_sweet_spot_trip",
+            "is_five_day_trip",
+            "mileage_tier",
+            "receipts_per_day",
+            "is_low_receipts",
+            "is_high_receipts",
+            "trip_type",
+        ]
+        analyze_feature_importance(dt, feature_names)
+
+        # Display tree rules
+        display_tree_rules(dt)
+
+        # Plot predictions vs actual
+        plot_predictions_vs_actual(y_test, y_test_pred)
+
+        # Evaluate model performance
+        print("\nEvaluating model performance...")
+        evaluation_results = evaluate_model(dt, df)
+
+        # Example predictions
+        print("\nExample Predictions:")
+        examples = [(3, 93, 1.42), (1, 55, 3.6), (5, 130, 306.9), (14, 958, 1727.76)]
+
+        for trip_days, miles, receipts in examples:
+            prediction = predict_new_case(dt, trip_days, miles, receipts)
+            print(
+                f"Trip: {trip_days} days, {miles} miles, ${receipts:.2f} receipts -> Predicted: ${prediction:.2f}"
+            )
+
+        return dt, df, evaluation_results
+    else:
+        # If we loaded an existing model, just return it
+        return dt, None, None
 
 
 if __name__ == "__main__":
