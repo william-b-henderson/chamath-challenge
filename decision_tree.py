@@ -204,20 +204,20 @@ def train_decision_tree(
     y_test_pred = dt.predict(X_test)
 
     # Calculate metrics
-    train_mse = mean_squared_error(y_train, y_train_pred)
-    test_mse = mean_squared_error(y_test, y_test_pred)
-    train_r2 = r2_score(y_train, y_train_pred)
-    test_r2 = r2_score(y_test, y_test_pred)
-    train_mae = mean_absolute_error(y_train, y_train_pred)
-    test_mae = mean_absolute_error(y_test, y_test_pred)
+    # train_mse = mean_squared_error(y_train, y_train_pred)
+    # test_mse = mean_squared_error(y_test, y_test_pred)
+    # train_r2 = r2_score(y_train, y_train_pred)
+    # test_r2 = r2_score(y_test, y_test_pred)
+    # train_mae = mean_absolute_error(y_train, y_train_pred)
+    # test_mae = mean_absolute_error(y_test, y_test_pred)
 
-    print("Decision Tree Results:")
-    print(f"Training MSE: {train_mse:.2f}")
-    print(f"Testing MSE: {test_mse:.2f}")
-    print(f"Training R²: {train_r2:.4f}")
-    print(f"Testing R²: {test_r2:.4f}")
-    print(f"Training MAE: {train_mae:.2f}")
-    print(f"Testing MAE: {test_mae:.2f}")
+    # print("Decision Tree Results:")
+    # print(f"Training MSE: {train_mse:.2f}")
+    # print(f"Testing MSE: {test_mse:.2f}")
+    # print(f"Training R²: {train_r2:.4f}")
+    # print(f"Testing R²: {test_r2:.4f}")
+    # print(f"Training MAE: {train_mae:.2f}")
+    # print(f"Testing MAE: {test_mae:.2f}")
 
     return dt, X_train, X_test, y_train, y_test, y_test_pred
 
